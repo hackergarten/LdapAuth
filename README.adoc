@@ -1,7 +1,7 @@
 = LdapAuth library
 
 image::https://travis-ci.org/hackergarten/LdapAuth.svg[link="https://travis-ci.org/hackergarten/LdapAuth"]
-image::https://coveralls.io/repos/hackergarten/LdapAuth/badge.svg[link="https://coveralls.io/r/hackergarten/LdapAuth"]
+image::https://coveralls.io/repos/hackergarten/LdapAuth/badge.svg?branch=master[link="https://coveralls.io/r/hackergarten/LdapAuth"]
 
 
 A very light weight library to provide LDAP authentication.
