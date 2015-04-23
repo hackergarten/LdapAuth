@@ -53,4 +53,12 @@ public class LdapAuthenticatorTest extends TestCase {
         Map<String, String> result = ldapAuthenticator.search("non-existent-user");
         assertNull(result);
     }
+
+    public void testSearchForUserWithWrongAttrsReturnsEmptyMap() throws Exception {
+        LdapAuthenticator ldapAuthenticator = new LdapAuthenticator("dc=example,dc=com", "ldap://ldap.forumsys.com:389/");
+        ldapAuthenticator.setUidProperty("uid");
+        ldapAuthenticator.setSearchAttributes("unknown,sample");
+        Map<String, String> result = ldapAuthenticator.search("riemann");
+        assertEquals(0,result.size());
+    }
 }
