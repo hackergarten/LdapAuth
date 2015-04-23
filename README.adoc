@@ -1,0 +1,10 @@
+= LdapAuth library
+
+A very light weight library to provide LDAP authentication.
+
+
+== build it
+
+Execute the following command to compile and package the project
+
+    ./gradlew build
