@@ -18,7 +18,7 @@ public class LdapAuthenticatorTest extends TestCase {
         assertEquals("cn=read-only-admin,dc=example,dc=com",uid);
     }
 
-    public void testSearchForUnknownUserReturnsNull() throws Exception {
+    public void testGetUidForUnknownUserReturnsNull() throws Exception {
         LdapAuthenticator ldapAuthenticator = new LdapAuthenticator("dc=example,dc=com", "ldap://ldap.forumsys.com:389/");
         ldapAuthenticator.setUidProperty("cn");
         String uid = ldapAuthenticator.getUid("non-existent-user");
@@ -44,6 +44,13 @@ public class LdapAuthenticatorTest extends TestCase {
         Map<String, String> result = ldapAuthenticator.search("riemann");
         assertNotNull(result);
         assertEquals(1,result.size());
-        assertEquals("riemann", ((Map.Entry)result.entrySet().toArray()[0]).getValue());
+        assertEquals("riemann", ((Map.Entry) result.entrySet().toArray()[0]).getValue());
+    }
+
+    public void testSearchForUnknownUserReturnsNull() throws Exception {
+        LdapAuthenticator ldapAuthenticator = new LdapAuthenticator("dc=example,dc=com", "ldap://ldap.forumsys.com:389/");
+        ldapAuthenticator.setUidProperty("cn");
+        Map<String, String> result = ldapAuthenticator.search("non-existent-user");
+        assertNull(result);
     }
 }
