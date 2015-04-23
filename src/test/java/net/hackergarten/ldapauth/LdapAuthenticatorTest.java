@@ -40,11 +40,14 @@ public class LdapAuthenticatorTest extends TestCase {
     public void testSearch() throws Exception{
         LdapAuthenticator ldapAuthenticator = new LdapAuthenticator("dc=example,dc=com", "ldap://ldap.forumsys.com:389/");
         ldapAuthenticator.setUidProperty("uid");
-        ldapAuthenticator.setSearchAttributes("uid");
+        ldapAuthenticator.setSearchAttributes("uid,cn,sn,mail");
         Map<String, String> result = ldapAuthenticator.search("riemann");
         assertNotNull(result);
-        assertEquals(1,result.size());
+        assertEquals(4,result.size());
         assertEquals("riemann", ((Map.Entry) result.entrySet().toArray()[0]).getValue());
+        assertEquals("riemann@ldap.forumsys.com", ((Map.Entry) result.entrySet().toArray()[1]).getValue());
+        assertEquals("Riemann", ((Map.Entry) result.entrySet().toArray()[2]).getValue());
+        assertEquals("Bernhard Riemann", ((Map.Entry) result.entrySet().toArray()[3]).getValue());
     }
 
     public void testSearchForUnknownUserReturnsNull() throws Exception {
