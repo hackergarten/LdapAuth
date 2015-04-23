@@ -1,4 +1,4 @@
-package net.hackergarten.ldapAuth;
+package net.hackergarten.ldapauth;
 
 /*
  *
