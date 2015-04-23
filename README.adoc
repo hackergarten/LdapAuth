@@ -1,5 +1,8 @@
 = LdapAuth library
 
+image::https://travis-ci.org/hackergarten/LdapAuth.svg[]
+
+
 A very light weight library to provide LDAP authentication.
 
 
