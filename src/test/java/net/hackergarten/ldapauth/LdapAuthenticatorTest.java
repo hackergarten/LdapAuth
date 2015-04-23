@@ -18,10 +18,23 @@ public class LdapAuthenticatorTest extends TestCase {
         assertEquals("cn=read-only-admin,dc=example,dc=com",uid);
     }
 
+    public void testSearchForUnknownUserReturnsNull() throws Exception {
+        LdapAuthenticator ldapAuthenticator = new LdapAuthenticator("dc=example,dc=com", "ldap://ldap.forumsys.com:389/");
+        ldapAuthenticator.setUidProperty("cn");
+        String uid = ldapAuthenticator.getUid("non-existent-user");
+        assertNull(uid);
+    }
+
     public void testBind() throws Exception {
         LdapAuthenticator ldapAuthenticator = new LdapAuthenticator("dc=example,dc=com", "ldap://ldap.forumsys.com:389/");
         boolean authenticated = ldapAuthenticator.testBind("cn=read-only-admin,dc=example,dc=com", "password");
         assertTrue(authenticated);
+    }
+
+    public void testBindFailsOnInvalidPassword() throws Exception {
+        LdapAuthenticator ldapAuthenticator = new LdapAuthenticator("dc=example,dc=com", "ldap://ldap.forumsys.com:389/");
+        boolean authenticated = ldapAuthenticator.testBind("cn=read-only-admin,dc=example,dc=com", "wrongPassword");
+        assertFalse(authenticated);
     }
 
     public void testSearch() throws Exception{
