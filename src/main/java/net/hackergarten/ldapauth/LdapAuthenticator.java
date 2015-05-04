@@ -1,8 +1,19 @@
-package net.hackergarten.ldapauth;
-
 /*
+ * Copyright 2015 the original author or authors.
  *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
+package net.hackergarten.ldapauth;
 
 import javax.naming.Context;
 import javax.naming.NamingEnumeration;
@@ -20,7 +31,7 @@ import java.util.Map;
 public class LdapAuthenticator {
     private static final String CONTEXT_FACTORY = "com.sun.jndi.ldap.LdapCtxFactory";
     private String searchBase = "ou=accounts,dc=hackergarten,dc=net";
-    private String ldapURI = "ldap://hackergartenserver:389/";// + searchBase;
+    private String ldapURI = "ldap://hackergartenserver:389/";
     private String uidProperty = "uid";
     private String searchAttributes = "cn,givenName,mail";
 
@@ -29,11 +40,11 @@ public class LdapAuthenticator {
         this.ldapURI = ldapURI;
     }
 
-    void setUidProperty(String uidProperty) {
+    public void setUidProperty(String uidProperty) {
         this.uidProperty = uidProperty;
     }
 
-    void setSearchAttributes(String searchAttributes) {
+    public void setSearchAttributes(String searchAttributes) {
         this.searchAttributes = searchAttributes;
     }
 
@@ -49,10 +60,17 @@ public class LdapAuthenticator {
         return ctx;
     }
 
-    public String getUid(String user) throws Exception {
+    /**
+     * find the full distinguished name (DN) for a given (identifying) property
+     *
+     * @param idPropValue the value to use to lookup the user, use "setUidProperty" to define the attribute
+     * @return DN for the user, NULL if no match could be found
+     * @throws NamingException
+     */
+    public String getDn(String idPropValue) throws NamingException {
         DirContext ctx = ldapContext();
 
-        String filter = "(" + uidProperty + "=" + user + ")";
+        String filter = "(" + uidProperty + "=" + idPropValue + ")";
         SearchControls ctrl = new SearchControls();
         ctrl.setSearchScope(SearchControls.SUBTREE_SCOPE);
         NamingEnumeration answer = ctx.search(searchBase, filter, ctrl);
@@ -68,7 +86,14 @@ public class LdapAuthenticator {
         return dn;
     }
 
-    public boolean testBind(String dn, String password) throws Exception {
+    /**
+     *
+     * @param dn the LDAP DistinguishedName of the user to authenticate ("bind" in LDAP terms)
+     * @param password password of the user
+     * @return boolean indicating if authentication was successful
+     * @throws NamingException
+     */
+    public boolean testBind(String dn, String password) throws NamingException {
         Hashtable<String, String> env = new Hashtable<String, String>();
         env.put(Context.SECURITY_AUTHENTICATION, "simple");
         env.put(Context.SECURITY_PRINCIPAL, dn);
@@ -82,6 +107,14 @@ public class LdapAuthenticator {
         return true;
     }
 
+    /**
+     * Search for a LDAP entity with an identifying value, the property to use for the search can be declared with
+     * `setUidProperty`, the attributes included in the results can be set with `etSearchAttributes`.
+     *
+     * @param uid value to search for
+     * @return a Map of the properties set by `setSearchAttributes`
+     * @throws NamingException
+     */
     public Map<String, String> search(String uid) throws NamingException {
         DirContext ldap = ldapContext();
 

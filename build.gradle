@@ -24,6 +24,7 @@ apply from: 'gradle/code-coverage.gradle'
 apply from: 'gradle/code-quality.gradle'
 
 repositories {
+    mavenLocal()
     jcenter()
 }
 

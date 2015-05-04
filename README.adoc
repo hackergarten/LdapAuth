@@ -1,10 +1,55 @@
 = LdapAuth library
+Markus Schlichting <https://github.com/madmas>, Hackergarten Basel
+:sourcedir: src/test/java
+
+
+:ldap-authenticator-unittest: https://github.com/hackergarten/LdapAuth/blob/master/src/test/java/net/hackergarten/ldapauth/LdapAuthenticatorTest.java
+:apache-directory-url: http://directory.apache.org
+:unboundid-url: https://www.ldap.com/unboundid-ldap-sdk-for-java
 
 image::https://travis-ci.org/hackergarten/LdapAuth.svg[link="https://travis-ci.org/hackergarten/LdapAuth"]
 image::https://coveralls.io/repos/hackergarten/LdapAuth/badge.svg?branch=master[link="https://coveralls.io/r/hackergarten/LdapAuth"]
 
-
 A very light weight library to provide LDAP authentication.
+
+Inspired by https://www.npmjs.com/package/ldapauth[npm ldapauth package].
+
+Intended to provide a much simpler API to lookup user details and authenticate user against a LDAP directory.
+
+If you nee a more comprehensive library to deal with LDAP, have a look at {apache-directory-url}[Apache Directory] or {unboundid-url}[UboundID LDAP SDK].
+
+== usage
+
+=== dependency
+
+
+
+=== snippet
+
+To authenticate a user against your LDAP, you need to know your LDAP ServerName and the search base the users you want to allow to authenticate are located in your LDAP structure.
+To do the actual authentication, you also need the full DN for the user to authenticate.
+To get this from a single identifying attribute, you need to do a search first.
+You can use `setUidProperty` to define the property to be used for the lookup. Given this, the resulting code would look like:
+
+[source,java]
+----
+LdapAuthenticator ldapAuthenticator = new LdapAuthenticator("dc=example,dc=com", "ldap://ldap.forumsys.com:389/");
+ldapAuthenticator.setUidProperty("cn");
+String dn = ldapAuthenticator.getDn("read-only-admin");
+
+boolean authenticated = ldapAuthenticator.testBind(dn, "password");
+----
+
+To read some more information about the user, you can use the `search` method:
+
+[source,java]
+.net/hackergarten/ldapauth/LdapAuthenticator.java
+----
+include::{sourcedir}net/hackergarten/ldapauth/LdapAuthenticator.java[tags=search]
+----
+
+=== examples
+Please have a look at the unit tests ({ldap-authenticator-unittest}[LdapAuthenticatorTest.java]) for an example on how to use this library.
 
 
 == build it
@@ -12,3 +57,5 @@ A very light weight library to provide LDAP authentication.
 Execute the following command to compile and package the project
 
     ./gradlew build
+
+

@@ -1,3 +1,18 @@
+/*
+ * Copyright 2015 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package net.hackergarten.ldapauth;
 
 import java.util.Map;
@@ -14,14 +29,14 @@ public class LdapAuthenticatorTest extends TestCase {
     public void testGetUid() throws Exception {
         LdapAuthenticator ldapAuthenticator = new LdapAuthenticator("dc=example,dc=com", "ldap://ldap.forumsys.com:389/");
         ldapAuthenticator.setUidProperty("cn");
-        String uid = ldapAuthenticator.getUid("read-only-admin");
-        assertEquals("cn=read-only-admin,dc=example,dc=com",uid);
+        String dn = ldapAuthenticator.getDn("read-only-admin");
+        assertEquals("cn=read-only-admin,dc=example,dc=com",dn);
     }
 
     public void testGetUidForUnknownUserReturnsNull() throws Exception {
         LdapAuthenticator ldapAuthenticator = new LdapAuthenticator("dc=example,dc=com", "ldap://ldap.forumsys.com:389/");
         ldapAuthenticator.setUidProperty("cn");
-        String uid = ldapAuthenticator.getUid("non-existent-user");
+        String uid = ldapAuthenticator.getDn("non-existent-user");
         assertNull(uid);
     }
 
@@ -38,6 +53,7 @@ public class LdapAuthenticatorTest extends TestCase {
     }
 
     public void testSearch() throws Exception{
+        // tag::search[]
         LdapAuthenticator ldapAuthenticator = new LdapAuthenticator("dc=example,dc=com", "ldap://ldap.forumsys.com:389/");
         ldapAuthenticator.setUidProperty("uid");
         ldapAuthenticator.setSearchAttributes("uid,cn,sn,mail");
@@ -48,6 +64,7 @@ public class LdapAuthenticatorTest extends TestCase {
         assertEquals("riemann@ldap.forumsys.com", ((Map.Entry) result.entrySet().toArray()[1]).getValue());
         assertEquals("Riemann", ((Map.Entry) result.entrySet().toArray()[2]).getValue());
         assertEquals("Bernhard Riemann", ((Map.Entry) result.entrySet().toArray()[3]).getValue());
+        // end::search[]
     }
 
     public void testSearchForUnknownUserReturnsNull() throws Exception {
