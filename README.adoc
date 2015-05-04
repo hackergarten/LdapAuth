@@ -45,7 +45,7 @@ To read some more information about the user, you can use the `search` method:
 [source,java]
 .net/hackergarten/ldapauth/LdapAuthenticator.java
 ----
-include::{sourcedir}net/hackergarten/ldapauth/LdapAuthenticator.java[tags=search]
+include::{sourcedir}/net/hackergarten/ldapauth/LdapAuthenticator.java[tags=search]
 ----
 
 === examples
