@@ -15,6 +15,7 @@ buildscript {
 
 apply plugin: 'idea'
 apply plugin: 'java'
+apply plugin: 'maven'
 apply plugin: 'com.github.kt3k.coveralls'
 apply plugin: 'build-dashboard'
 apply plugin: 'org.kordamp.gradle.stats'
