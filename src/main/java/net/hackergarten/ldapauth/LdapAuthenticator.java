@@ -29,9 +29,14 @@ import java.util.Hashtable;
 import java.util.Map;
 
 public class LdapAuthenticator {
+
     private static final String CONTEXT_FACTORY = "com.sun.jndi.ldap.LdapCtxFactory";
-    private String searchBase = "ou=accounts,dc=hackergarten,dc=net";
-    private String ldapURI = "ldap://hackergartenserver:389/";
+    private static final String DEFAULT_AUTHENTICATION_METHOD = "simple";
+
+    //i.e "ou=accounts,dc=hackergarten,dc=net"
+    private String searchBase;
+    //i.e "ldap://hackergartenserver:389/"
+    private String ldapURI;
     private String uidProperty = "uid";
     private String searchAttributes = "cn,givenName,mail";
 
@@ -44,20 +49,23 @@ public class LdapAuthenticator {
         this.uidProperty = uidProperty;
     }
 
+    public String getUidProperty() {
+        return uidProperty;
+    }
+
     public void setSearchAttributes(String searchAttributes) {
         this.searchAttributes = searchAttributes;
     }
 
     private DirContext ldapContext() throws NamingException {
-        Hashtable<String, String> env = new Hashtable<String, String>();
+        Hashtable<String, String> env = new Hashtable<>();
         return ldapContext(env);
     }
 
-    private DirContext ldapContext(Hashtable<String, String> env) throws NamingException {
+    DirContext ldapContext(Hashtable<String, String> env) throws NamingException {
         env.put(Context.INITIAL_CONTEXT_FACTORY, CONTEXT_FACTORY);
         env.put(Context.PROVIDER_URL, ldapURI);
-        DirContext ctx = new InitialDirContext(env);
-        return ctx;
+        return new InitialDirContext(env);
     }
 
     /**
@@ -95,7 +103,7 @@ public class LdapAuthenticator {
      */
     public boolean testBind(String dn, String password) throws NamingException {
         Hashtable<String, String> env = new Hashtable<String, String>();
-        env.put(Context.SECURITY_AUTHENTICATION, "simple");
+        env.put(Context.SECURITY_AUTHENTICATION, DEFAULT_AUTHENTICATION_METHOD);
         env.put(Context.SECURITY_PRINCIPAL, dn);
         env.put(Context.SECURITY_CREDENTIALS, password);
 
@@ -127,7 +135,7 @@ public class LdapAuthenticator {
         if (answer.hasMoreElements()) {
             Attributes attrs = answer.next().getAttributes();
             if (attrs != null) {
-                amap = new HashMap<String, String>();
+                amap = new HashMap<>();
                 NamingEnumeration<? extends Attribute> ne = attrs.getAll();
 
                 while (ne.hasMore()) {
