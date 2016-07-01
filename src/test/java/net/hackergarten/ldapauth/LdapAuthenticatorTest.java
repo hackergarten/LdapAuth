@@ -15,9 +15,6 @@
  */
 package net.hackergarten.ldapauth;
 
-import org.junit.Test;
-import org.mockito.ArgumentCaptor;
-
 import javax.naming.Context;
 import javax.naming.NamingEnumeration;
 import javax.naming.directory.DirContext;
@@ -25,10 +22,22 @@ import javax.naming.directory.SearchControls;
 import java.util.Hashtable;
 import java.util.Map;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.*;
+import org.hamcrest.CoreMatchers;
+import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Matchers;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 
 /**
  * Implement some basic test using the public ldap from forumsys.
@@ -57,7 +66,7 @@ public class LdapAuthenticatorTest {
         LdapAuthenticator authenticatorSpy = spy(new LdapAuthenticator("dc=example,dc=com", "ldap://ldap.forumsys.com:389/"));
 
         DirContext dirContext = mock(DirContext.class);
-        doReturn(dirContext).when(authenticatorSpy).ldapContext(any());
+        doReturn(dirContext).when(authenticatorSpy).ldapContext((Hashtable<String, String>) Matchers.any());
         ArgumentCaptor<SearchControls> argumentCaptor = ArgumentCaptor.forClass(SearchControls.class);
         NamingEnumeration answer = mock(NamingEnumeration.class);
         doReturn(answer).when(dirContext).search(anyString(), anyString(), argumentCaptor.capture());
@@ -92,7 +101,7 @@ public class LdapAuthenticatorTest {
         ArgumentCaptor<Hashtable> captor = ArgumentCaptor.forClass(Hashtable.class);
         doReturn(mock(DirContext.class)).when(authenticatorSpy).ldapContext(captor.capture());
         authenticatorSpy.testBind("cn=read-only-admin,dc=example,dc=com", "password");
-        assertThat(captor.getValue().get(Context.SECURITY_AUTHENTICATION), is("simple"));
+        assertThat(captor.getValue().get(Context.SECURITY_AUTHENTICATION), CoreMatchers.<Object>is("simple"));
     }
 
     @Test
