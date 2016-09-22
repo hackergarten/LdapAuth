@@ -11,6 +11,7 @@ before_script:
                                      --bindDn cn=admin \
                                      --bindPassword password \
                                      --ldifFile file.LDIF &
+  - cd ..
 script: ./gradlew clean build jacocoTestReport
 jdk: oraclejdk8
 env: TERM=dumb
