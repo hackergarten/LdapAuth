@@ -15,24 +15,71 @@
  */
 package net.hackergarten.ldapauth;
 
+import javax.naming.Context;
+import javax.naming.NamingEnumeration;
+import javax.naming.directory.DirContext;
+import javax.naming.directory.SearchControls;
+import java.util.Hashtable;
 import java.util.Map;
 
-import junit.framework.TestCase;
+import org.hamcrest.CoreMatchers;
+import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Matchers;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 
 /**
  * Implement some basic test using the public ldap from forumsys.
  *
  * see http://www.forumsys.com/tutorials/integration-how-to/ldap/online-ldap-test-server/
  */
-public class LdapAuthenticatorTest extends TestCase {
+public class LdapAuthenticatorTest {
 
-    public void testGetUid() throws Exception {
+    @Test
+    public void testCreateDnWithCustomUid() throws Exception {
         LdapAuthenticator ldapAuthenticator = new LdapAuthenticator("dc=example,dc=com", "ldap://ldap.forumsys.com:389/");
         ldapAuthenticator.setUidProperty("cn");
         String dn = ldapAuthenticator.getDn("read-only-admin");
         assertEquals("cn=read-only-admin,dc=example,dc=com",dn);
     }
 
+    @Test
+    public void testDefaultUid() throws Exception {
+        LdapAuthenticator ldapAuthenticator = new LdapAuthenticator("dc=example,dc=com", "ldap://ldap.forumsys.com:389/");
+        assertEquals("uid", ldapAuthenticator.getUidProperty());
+    }
+
+    @Test
+    public void testGetDn() throws Exception {
+        //given
+        LdapAuthenticator authenticatorSpy = spy(new LdapAuthenticator("dc=example,dc=com", "ldap://ldap.forumsys.com:389/"));
+
+        DirContext dirContext = mock(DirContext.class);
+        doReturn(dirContext).when(authenticatorSpy).ldapContext((Hashtable<String, String>) Matchers.any());
+        ArgumentCaptor<SearchControls> argumentCaptor = ArgumentCaptor.forClass(SearchControls.class);
+        NamingEnumeration answer = mock(NamingEnumeration.class);
+        doReturn(answer).when(dirContext).search(anyString(), anyString(), argumentCaptor.capture());
+
+        //when
+        authenticatorSpy.getDn("read-only-admin");
+
+        //then
+        assertEquals(SearchControls.SUBTREE_SCOPE,argumentCaptor.getValue().getSearchScope());
+        verify(answer).close();
+    }
+
+    @Test
     public void testGetUidForUnknownUserReturnsNull() throws Exception {
         LdapAuthenticator ldapAuthenticator = new LdapAuthenticator("dc=example,dc=com", "ldap://ldap.forumsys.com:389/");
         ldapAuthenticator.setUidProperty("cn");
@@ -40,18 +87,31 @@ public class LdapAuthenticatorTest extends TestCase {
         assertNull(uid);
     }
 
+    @Test
     public void testBind() throws Exception {
         LdapAuthenticator ldapAuthenticator = new LdapAuthenticator("dc=example,dc=com", "ldap://ldap.forumsys.com:389/");
         boolean authenticated = ldapAuthenticator.testBind("cn=read-only-admin,dc=example,dc=com", "password");
         assertTrue(authenticated);
     }
 
+    @Test
+    public void testBind_SimpleAuthentication() throws Exception {
+        LdapAuthenticator authenticatorSpy = spy(new LdapAuthenticator("dc=example,dc=com", "ldap://ldap.forumsys.com:389/"));
+
+        ArgumentCaptor<Hashtable> captor = ArgumentCaptor.forClass(Hashtable.class);
+        doReturn(mock(DirContext.class)).when(authenticatorSpy).ldapContext(captor.capture());
+        authenticatorSpy.testBind("cn=read-only-admin,dc=example,dc=com", "password");
+        assertThat(captor.getValue().get(Context.SECURITY_AUTHENTICATION), CoreMatchers.<Object>is("simple"));
+    }
+
+    @Test
     public void testBindFailsOnInvalidPassword() throws Exception {
         LdapAuthenticator ldapAuthenticator = new LdapAuthenticator("dc=example,dc=com", "ldap://ldap.forumsys.com:389/");
         boolean authenticated = ldapAuthenticator.testBind("cn=read-only-admin,dc=example,dc=com", "wrongPassword");
         assertFalse(authenticated);
     }
 
+    @Test
     public void testSearch() throws Exception{
         // tag::search[]
         LdapAuthenticator ldapAuthenticator = new LdapAuthenticator("dc=example,dc=com", "ldap://ldap.forumsys.com:389/");
@@ -67,6 +127,7 @@ public class LdapAuthenticatorTest extends TestCase {
         // end::search[]
     }
 
+    @Test
     public void testSearchForUnknownUserReturnsNull() throws Exception {
         LdapAuthenticator ldapAuthenticator = new LdapAuthenticator("dc=example,dc=com", "ldap://ldap.forumsys.com:389/");
         ldapAuthenticator.setUidProperty("cn");
@@ -74,6 +135,7 @@ public class LdapAuthenticatorTest extends TestCase {
         assertNull(result);
     }
 
+    @Test
     public void testSearchForUserWithWrongAttrsReturnsEmptyMap() throws Exception {
         LdapAuthenticator ldapAuthenticator = new LdapAuthenticator("dc=example,dc=com", "ldap://ldap.forumsys.com:389/");
         ldapAuthenticator.setUidProperty("uid");
