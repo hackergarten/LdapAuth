@@ -1,5 +1,10 @@
 language: java
+before_script:
+  - cd ldapServer
+  - unzip sample-code-3.0.zip
+  - sample-code-3.0/bin/sample-code --namingContext "DC=example,DC=com" --baseObject "dc=example,dc=com" --scope SUB --filter "(objectClass=*)" --hostname localhost --port 11389 --bindDn cn=admin --bindPassword password --ldifFile file.LDIF &
+  - cd ..
 script: ./gradlew clean build jacocoTestReport
-jdk: oraclejdk7
+jdk: oraclejdk8
 env: TERM=dumb
 after_success: ./gradlew coveralls

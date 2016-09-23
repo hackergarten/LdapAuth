@@ -7,7 +7,7 @@ Markus Schlichting <https://github.com/madmas>, Hackergarten Basel
 :apache-directory-url: http://directory.apache.org
 :unboundid-url: https://www.ldap.com/unboundid-ldap-sdk-for-java
 
-image::https://travis-ci.org/hackergarten/LdapAuth.svg[link="https://travis-ci.org/hackergarten/LdapAuth"]
+image::https://travis-ci.org/hackergarten/LdapAuth.svg?branch=master[link="https://travis-ci.org/hackergarten/LdapAuth"]
 image::https://coveralls.io/repos/hackergarten/LdapAuth/badge.svg?branch=master[link="https://coveralls.io/r/hackergarten/LdapAuth"]
 
 A very light weight library to provide LDAP authentication.
