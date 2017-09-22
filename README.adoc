@@ -22,7 +22,18 @@ If you nee a more comprehensive library to deal with LDAP, have a look at {apach
 
 === dependency
 
+==== Maven
 
+ <dependency> 
+  <groupId>net.hackergarten</groupId>
+  <artifactId>ldapauth</artifactId>
+  <version>1.0.0</version>
+  <type>pom</type>
+ </dependency>
+
+==== Gradle
+
+ compile 'net.hackergarten:ldapauth:1.0.0'
 
 === snippet
 
